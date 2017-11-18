@@ -4,6 +4,12 @@
 		<title>Ludum Dare 40 Submission</title>
 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 		<link rel="stylesheet" href="./style.css" />
+		
+		<!-- Unity WebGL Stuff -->
+		<script src="Build/acf09dfbfe67bbf23c33885a57bcedfb.js"></script>
+		<script>
+			var gameInstance = UnityLoader.instantiate("gameContainer", "Build/7a3902d003c69fea4d521ede996e69da.json");
+		</script>
 	</head>
 	<body>
 		<div class="container">
@@ -12,6 +18,8 @@
 			</div>
 			<div class="row">
 				<div class="col-md-10 col-md-offset-1">
+					<p>Some random WebGL build to make sure the page layout works.</p>
+					<div id="gameContainer" style="width: 720px; height: 405px; margin: auto"></div>
 				</div>
 			</div>
 		</div>
