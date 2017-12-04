@@ -2,15 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PirateController : MonoBehaviour {
+namespace FallingSloth.LD40
+{
+    public class PirateController : MonoBehaviour
+    {
+        [HideInInspector]
+        public PirateManager manager;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        void OnCollisionEnter2D(Collision2D collision)
+        {
+            switch (collision.gameObject.tag)
+            {
+                case "PlayerProjectile":
+                    // Add Points
+                    break;
+            }
+        }
+
+        public void Destroy()
+        {
+            gameObject.SetActive(false);
+        }
+    }
 }

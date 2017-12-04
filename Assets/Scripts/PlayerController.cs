@@ -21,6 +21,8 @@ namespace FallingSloth.LD40
 
         public float delayBetweenShots = .1f;
         float timeOfLastShot = 0f;
+
+        public float maxVelocity = 50f;
         
         public float lootValue = 0f;
         public Text lootText;
@@ -35,6 +37,8 @@ namespace FallingSloth.LD40
             rigidbody2D = GetComponent<Rigidbody2D>();
 
             bulletPool = new Pool<Projectile>(bulletPrefab, 20);
+
+            StartCoroutine(AddPoints());
         }
 
         void Update()
@@ -62,14 +66,16 @@ namespace FallingSloth.LD40
             Vector2 moveDirection = Vector2.zero;
 
             if (Mathf.Abs(Input.GetAxis("Horizontal")) > deadzone)
-                moveDirection.x = Input.GetAxis("Horizontal");
+                rigidbody2D.velocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime, rigidbody2D.velocity.y);
+            else
+                rigidbody2D.velocity = new Vector2(0f, rigidbody2D.velocity.y);
 
             if (Mathf.Abs(Input.GetAxis("Vertical")) > deadzone)
-                moveDirection.y = Input.GetAxis("Vertical");
-            
-            Vector2 v = moveDirection.normalized * moveSpeed * Time.fixedDeltaTime;
+                rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, Input.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime);
+            else
+                rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, 0f);
 
-            rigidbody2D.velocity = v;
+            rigidbody2D.velocity = rigidbody2D.velocity.Clamp(new Vector2(-maxVelocity, -maxVelocity), new Vector2(maxVelocity, maxVelocity));
         }
 
         void Fire(Vector2 direction)
@@ -98,15 +104,17 @@ namespace FallingSloth.LD40
 
         void UpdateUI()
         {
-            lootText.text = "Loot: " + lootValue;
-            scoreText.text = "Score: " + score;
+            lootText.text = string.Format("Loot: {0:0.0}", lootValue);
+            scoreText.text = string.Format("Score: {0:0.0}", score);
         }
 
         IEnumerator AddPoints()
         {
-            yield return new WaitForSeconds(1f);
-
-            score += lootValue * pointsPerLootPerSecond;
+            while (true)
+            {
+                yield return new WaitForSeconds(1f);
+                score += lootValue * pointsPerLootPerSecond;
+            }
         }
     }
 }
