@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CnControls;
+using FallingSloth.Audio;
 
 namespace FallingSloth.LD40
 {
@@ -32,6 +34,8 @@ namespace FallingSloth.LD40
 
         public float pointsPerLootPerSecond = 1f;
 
+        public string shootSoundName = "PlayerShoot";
+
         void Start()
         {
             rigidbody2D = GetComponent<Rigidbody2D>();
@@ -43,21 +47,12 @@ namespace FallingSloth.LD40
 
         void Update()
         {
-            #region Mouse Fire
-#if UNITY_WEBGL || UNITY_EDITOR
-            if (Input.GetMouseButton(0))
-            { // If the left mouse button is being held down, Fire
-                Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-                Fire(direction.normalized);
-            }
-#endif
-            #endregion
-            #region Touch input Fire
-#if UNITY_ANDROID
-            // Android code for on-screen thumbsticks
-#endif
-            #endregion
-            
+            float x = CnInputManager.GetAxis("FireX");
+            float y = CnInputManager.GetAxis("FireY");
+
+            if (Mathf.Abs(x) > deadzone || Mathf.Abs(y) > deadzone)
+                Fire(new Vector2(x, y).normalized);
+
             UpdateUI();
         }
         
@@ -65,13 +60,13 @@ namespace FallingSloth.LD40
         {
             Vector2 moveDirection = Vector2.zero;
 
-            if (Mathf.Abs(Input.GetAxis("Horizontal")) > deadzone)
-                rigidbody2D.velocity = new Vector2(Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime, rigidbody2D.velocity.y);
+            if (Mathf.Abs(CnInputManager.GetAxis("Horizontal")) > deadzone)
+                rigidbody2D.velocity = new Vector2(CnInputManager.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime, rigidbody2D.velocity.y);
             else
                 rigidbody2D.velocity = new Vector2(0f, rigidbody2D.velocity.y);
 
-            if (Mathf.Abs(Input.GetAxis("Vertical")) > deadzone)
-                rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, Input.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime);
+            if (Mathf.Abs(CnInputManager.GetAxis("Vertical")) > deadzone)
+                rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, CnInputManager.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime);
             else
                 rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, 0f);
 
@@ -86,6 +81,7 @@ namespace FallingSloth.LD40
                 temp.transform.position = transform.position + new Vector3(0f, 0f, temp.transform.position.z);
                 temp.gameObject.SetActive(true);
                 temp.gameObject.GetComponent<Rigidbody2D>().AddForce(direction * fireForce, ForceMode2D.Impulse);
+                AudioManager.PlaySound(shootSoundName);
                 timeOfLastShot = Time.time;
             }
         }
